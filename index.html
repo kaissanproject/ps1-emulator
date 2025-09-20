@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
-    <title>PS1 Web Emulator - Robusto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PS1 Web Emulator - Tentativa Final</title>
     <!-- Tailwind CSS e Fontes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,8 +24,8 @@
         // Função para ser chamada se o script do emulador falhar ao carregar
         function handleEmulatorScriptError() {
             const msgElement = document.getElementById('initial-message');
-            msgElement.innerHTML = `<h2 class="text-2xl font-semibold text-red-500">Erro Crítico de Rede</h2><p class="text-gray-400 mt-2">O ficheiro do emulador foi bloqueado. Tente desativar o seu bloqueador de anúncios (AdBlock) para este site e atualize a página.</p>`;
-            console.error("FALHA AO CARREGAR O SCRIPT DO EMULADOR. Provavelmente bloqueado por um AdBlocker.");
+            msgElement.innerHTML = `<h2 class="text-2xl font-semibold text-red-500">Erro Crítico de Rede</h2><p class="text-gray-400 mt-2">O ficheiro do emulador foi bloqueado pela sua rede ou por um software de segurança. Tente aceder a partir de outra rede (ex: dados móveis).</p>`;
+            console.error("FALHA AO CARREGAR O SCRIPT DO EMULADOR. Provavelmente bloqueado pela rede/firewall.");
         }
     </script>
 </head>
@@ -33,7 +33,7 @@
 
     <div class="w-full max-w-4xl mx-auto">
         <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-blue-400">PS1 Web Emulator</h1>
+            <h1 class="text-4xl font-bold text-blue-400">PS1 Emulator - Tentativa Final</h1>
             <p class="text-gray-400 mt-2">Jogue os seus clássicos de PlayStation 1 diretamente no navegador.</p>
         </header>
 
@@ -72,15 +72,14 @@
     </div>
     <div id="toast" class="toast">Mensagem</div>
 
-    <!-- MUDANÇA ESTRUTURAL: Scripts no final do body para máxima compatibilidade -->
-    <script src="https://cdn.jsdelivr.net/npm/tonic-psx-wasm@0.4.1/dist/tonic.min.js" onerror="handleEmulatorScriptError()"></script>
+    <!-- MUDANÇA ESTRUTURAL: Scripts no final do body, tentando um servidor alternativo (unpkg.com) -->
+    <script src="https://unpkg.com/tonic-psx-wasm@0.4.1/dist/tonic.min.js" onerror="handleEmulatorScriptError()"></script>
     <script>
         // Este script só executa depois do de cima carregar
         
         // Verificação inicial
         if (typeof Tonic === 'undefined') {
             // A função 'handleEmulatorScriptError' já terá sido chamada pelo 'onerror'
-            // mas mantemos uma verificação aqui por segurança.
             console.error("O objeto Tonic não foi definido. O script do emulador não foi executado corretamente.");
         } else {
             // Se chegámos aqui, está tudo bem. Iniciamos a aplicação.
