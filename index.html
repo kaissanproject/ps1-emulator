@@ -90,10 +90,10 @@
     <!-- Elemento para notificações (toast) -->
     <div id="toast" class="toast">Mensagem</div>
 
-    <!-- Carregamento do emulador via módulo ES. 
-         [CORREÇÃO]: O link da biblioteca foi atualizado para um funcional. -->
+    <!-- Carregamento do emulador via módulo ES.
+         [CORREÇÃO FINAL]: Link do jsDelivr corrigido, que permite partilha entre sites (CORS). -->
     <script type="module">
-        import * as Tonic from 'https://unpkg.com/tonic-psx-wasm@0.4.1/dist/tonic.min.js';
+        import * as Tonic from 'https://cdn.jsdelivr.net/npm/tonic-psx-wasm@0.4.1/dist/tonic.min.js';
 
         // --- Referências aos elementos do DOM ---
         const canvas = document.getElementById('game-canvas');
