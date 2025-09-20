@@ -3,65 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PS1 Web Emulator</title>
-    <!-- Tailwind CSS para estilização rápida e responsiva -->
+    <title>PS1 Emulator - Versão Final</title>
+    <!-- Tailwind CSS para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonte Inter do Google Fonts para uma aparência moderna -->
+    <!-- Fonte Inter do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Carregamos o emulador com uma tag de script normal e 'defer' para garantir a ordem de execução -->
+    <script src="https://cdn.jsdelivr.net/npm/tonic-psx-wasm@0.4.1/dist/tonic.min.js" defer></script>
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        canvas:focus {
-            outline: none;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        canvas:focus { outline: none; }
         .toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 30px;
-            opacity: 0;
-            transition: opacity 0.5s, visibility 0.5s;
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 8px; padding: 16px; position: fixed;
+            z-index: 1; left: 50%; transform: translateX(-50%); bottom: 30px;
+            opacity: 0; transition: opacity 0.5s, visibility 0.5s;
         }
-        .toast.show {
-            visibility: visible;
-            opacity: 1;
-        }
+        .toast.show { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-4xl mx-auto">
         <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-blue-400">PS1 Web Emulator</h1>
+            <!-- MUDANÇA DE DIAGNÓSTICO: Alterámos o título aqui -->
+            <h1 class="text-4xl font-bold text-blue-400">PS1 Emulator - Versão Final</h1>
             <p class="text-gray-400 mt-2">Jogue os seus clássicos de PlayStation 1 diretamente no navegador.</p>
         </header>
 
         <main class="bg-gray-800 rounded-lg shadow-2xl p-4">
-            <!-- Tela do Emulador -->
             <div id="emulator-screen" class="aspect-video bg-black rounded-md overflow-hidden relative">
                 <canvas id="game-canvas" class="w-full h-full"></canvas>
-                <!-- Mensagem inicial para o utilizador -->
                 <div id="initial-message" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                     <svg class="w-16 h-16 text-gray-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.353-.026.692-.026 1.038 0 .346.026.685.026 1.038 0 1.13.094 1.976 1.057 1.976 2.192V7.5M8.25 7.5h7.5m-7.5 0-1.103 9.372c-.066.564.022 1.141.222 1.683.3.812.983 1.45 1.883 1.637C10.23 20.43 10.57 20.5 11 20.5h2c.43 0 .77-.07 1.11-.208.9-.187 1.583-.825 1.883-1.637.2-.542.288-1.12.222-1.683L15.75 7.5m-7.5 0-1.409-1.409a1.125 1.125 0 0 1 0-1.591l.296-.296a1.125 1.125 0 0 1 1.591 0L8.25 7.5m7.5 0 1.409-1.409a1.125 1.125 0 0 0 0-1.591l-.296-.296a1.125 1.125 0 0 0-1.591 0L15.75 7.5" />
                     </svg>
                     <h2 class="text-2xl font-semibold">Nenhum jogo carregado</h2>
-                    <p class="text-gray-400 mt-2">Clique em "Carregar Jogo" para selecionar um ficheiro ISO/BIN/CUE do seu computador.</p>
+                    <p class="text-gray-400 mt-2">Clique em "Carregar Jogo" para selecionar um ficheiro ISO/BIN/CUE.</p>
                 </div>
             </div>
 
-            <!-- Painel de Controlo -->
             <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <button id="load-rom-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center">
                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.25 13.25a.75.75 0 0 0 1.5 0V4.636l2.955 3.129a.75.75 0 0 0 1.09-1.03l-4.25-4.5a.75.75 0 0 0-1.09 0l-4.25 4.5a.75.75 0 1 0 1.09 1.03L9.25 4.636v8.614Z" /><path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" /></svg>
@@ -86,152 +71,137 @@
 
     <div id="toast" class="toast">Mensagem</div>
 
-    <script type="module">
-        // ATENÇÃO: VERIFIQUE BEM ESTA LINHA AO COPIAR E COLAR.
-        // O link deve estar completo, exatamente como está aqui.
-        import * as Tonic from '[https://cdn.jsdelivr.net/npm/tonic-psx-wasm@0.4.1/dist/tonic.min.js](https://cdn.jsdelivr.net/npm/tonic-psx-wasm@0.4.1/dist/tonic.min.js)';
-
-
-        const canvas = document.getElementById('game-canvas');
-        const initialMessage = document.getElementById('initial-message');
-        const romInput = document.getElementById('rom-input');
-        const loadRomBtn = document.getElementById('load-rom-btn');
-        const saveStateBtn = document.getElementById('save-state-btn');
-        const loadStateBtn = document.getElementById('load-state-btn');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-        const toast = document.getElementById('toast');
-
-        let emu = null;
-        let isGameLoaded = false;
-
-        function showToast(message) {
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        const DB_NAME = 'PS1_EMU_SAVES';
-        const STORE_NAME = 'save_states';
-        let db;
-
-        const request = indexedDB.open(DB_NAME, 1);
-        request.onerror = (event) => console.error("Erro no IndexedDB:", event);
-        request.onsuccess = (event) => db = event.target.result;
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            db.createObjectStore(STORE_NAME);
-        };
-
-        async function saveStateToDB(stateData) {
-            if (!db) {
-                showToast("Erro: Base de dados não está pronta.");
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof Tonic === 'undefined') {
+                console.error("Biblioteca do Emulador (Tonic) não foi carregada.");
+                const msgElement = document.getElementById('initial-message');
+                msgElement.innerHTML = `<h2 class="text-2xl font-semibold text-red-500">Erro Crítico de Arranque</h2><p class="text-gray-400 mt-2">A biblioteca do emulador não pôde ser carregada. Por favor, limpe a cache do seu navegador e tente novamente.</p>`;
                 return;
             }
-            const transaction = db.transaction(STORE_NAME, 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
-            store.put(stateData, 'slot_1');
-            return new Promise((resolve) => {
-                transaction.oncomplete = () => {
-                    showToast("Estado guardado com sucesso!");
-                    resolve();
-                };
-            });
-        }
+            
+            const canvas = document.getElementById('game-canvas');
+            const initialMessage = document.getElementById('initial-message');
+            const romInput = document.getElementById('rom-input');
+            const loadRomBtn = document.getElementById('load-rom-btn');
+            const saveStateBtn = document.getElementById('save-state-btn');
+            const loadStateBtn = document.getElementById('load-state-btn');
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const toast = document.getElementById('toast');
 
-        async function loadStateFromDB() {
-            if (!db) {
-                showToast("Erro: Base de dados não está pronta.");
-                return null;
+            let emu = null;
+            let isGameLoaded = false;
+
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => { toast.classList.remove('show'); }, 3000);
             }
-            const transaction = db.transaction(STORE_NAME, 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.get('slot_1');
-            return new Promise((resolve, reject) => {
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = (event) => reject(event);
-            });
-        }
 
-        loadRomBtn.addEventListener('click', () => {
-            romInput.click();
-        });
+            const DB_NAME = 'PS1_EMU_SAVES';
+            const STORE_NAME = 'save_states';
+            let db;
 
-        romInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            showToast("A carregar jogo... Isto pode demorar um momento.");
-            initialMessage.innerHTML = `<h2 class="text-xl">A carregar ${file.name}...</h2><p class="text-gray-400">Por favor, aguarde.</p>`;
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const romData = e.target.result;
-
-                if (emu) {
-                    await emu.exit();
-                }
-                
-                emu = new Tonic.Emulator(canvas);
-
-                try {
-                    await emu.load_rom(romData);
-                    initialMessage.style.display = 'none';
-                    isGameLoaded = true;
-                    emu.run();
-                } catch (error) {
-                    console.error("Erro ao carregar a ROM:", error);
-                    showToast("Falha ao carregar o ficheiro do jogo.");
-                    initialMessage.style.display = 'flex';
-                    initialMessage.innerHTML = `<h2 class="text-xl text-red-400">Erro!</h2><p class="text-gray-400">Não foi possível carregar este ficheiro. Verifique se é um formato de jogo PS1 válido (.iso, .bin, .cue).</p>`;
-                    isGameLoaded = false;
-                }
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onerror = (event) => console.error("Erro no IndexedDB:", event);
+            request.onsuccess = (event) => db = event.target.result;
+            request.onupgradeneeded = (event) => {
+                db = event.target.result;
+                db.createObjectStore(STORE_NAME);
             };
-            reader.readAsArrayBuffer(file);
-        });
 
-        saveStateBtn.addEventListener('click', async () => {
-            if (!isGameLoaded || !emu) {
-                showToast("Nenhum jogo em execução para guardar.");
-                return;
-            }
-            try {
-                const state = await emu.save_state();
-                await saveStateToDB(state);
-            } catch (error) {
-                console.error("Erro ao guardar estado:", error);
-                showToast("Falha ao guardar o estado.");
-            }
-        });
-
-        loadStateBtn.addEventListener('click', async () => {
-            if (!isGameLoaded || !emu) {
-                showToast("Nenhum jogo em execução para carregar estado.");
-                return;
-            }
-            try {
-                const stateData = await loadStateFromDB();
-                if (stateData) {
-                    await emu.load_state(stateData);
-                    showToast("Estado carregado com sucesso!");
-                } else {
-                    showToast("Nenhum estado guardado encontrado.");
-                }
-            } catch (error) {
-                console.error("Erro ao carregar estado:", error);
-                showToast("Falha ao carregar o estado.");
-            }
-        });
-
-        fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                canvas.requestFullscreen().catch(err => {
-                    alert(`Erro ao tentar entrar em ecrã inteiro: ${err.message}`);
+            async function saveStateToDB(stateData) {
+                if (!db) { showToast("Erro: Base de dados não está pronta."); return; }
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                store.put(stateData, 'slot_1');
+                return new Promise((resolve) => {
+                    transaction.oncomplete = () => {
+                        showToast("Estado guardado com sucesso!");
+                        resolve();
+                    };
                 });
-            } else {
-                document.exitFullscreen();
             }
+
+            async function loadStateFromDB() {
+                if (!db) { showToast("Erro: Base de dados não está pronta."); return null; }
+                const transaction = db.transaction(STORE_NAME, 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get('slot_1');
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event);
+                });
+            }
+
+            loadRomBtn.addEventListener('click', () => { romInput.click(); });
+
+            romInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                showToast("A carregar jogo... Isto pode demorar um momento.");
+                initialMessage.innerHTML = `<h2 class="text-xl">A carregar ${file.name}...</h2><p class="text-gray-400">Por favor, aguarde.</p>`;
+                
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const romData = e.target.result;
+                    if (emu) { await emu.exit(); }
+                    
+                    emu = new Tonic.Emulator(canvas);
+
+                    try {
+                        await emu.load_rom(romData);
+                        initialMessage.style.display = 'none';
+                        isGameLoaded = true;
+                        emu.run();
+                    } catch (error) {
+                        console.error("Erro ao carregar a ROM:", error);
+                        showToast("Falha ao carregar o ficheiro do jogo.");
+                        initialMessage.style.display = 'flex';
+                        initialMessage.innerHTML = `<h2 class="text-xl text-red-400">Erro!</h2><p class="text-gray-400">Não foi possível carregar este ficheiro. Verifique se é um formato de jogo PS1 válido.</p>`;
+                        isGameLoaded = false;
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+
+            saveStateBtn.addEventListener('click', async () => {
+                if (!isGameLoaded || !emu) { showToast("Nenhum jogo em execução para guardar."); return; }
+                try {
+                    const state = await emu.save_state();
+                    await saveStateToDB(state);
+                } catch (error) {
+                    console.error("Erro ao guardar estado:", error);
+                    showToast("Falha ao guardar o estado.");
+                }
+            });
+
+            loadStateBtn.addEventListener('click', async () => {
+                if (!isGameLoaded || !emu) { showToast("Nenhum jogo em execução para carregar estado."); return; }
+                try {
+                    const stateData = await loadStateFromDB();
+                    if (stateData) {
+                        await emu.load_state(stateData);
+                        showToast("Estado carregado com sucesso!");
+                    } else {
+                        showToast("Nenhum estado guardado encontrado.");
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar estado:", error);
+                    showToast("Falha ao carregar o estado.");
+                }
+            });
+
+            fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    canvas.requestFullscreen().catch(err => {
+                        alert(`Erro ao tentar entrar em ecrã inteiro: ${err.message}`);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            });
         });
     </script>
 </body>
