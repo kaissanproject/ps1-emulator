@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PS1 Web Emulator - Agora Vai!</title>
+    <title>PS1 Web Emulator - Versão Corrigida</title>
     <!-- Tailwind CSS e Fontes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,9 +29,10 @@
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-4xl mx-auto">
-        <header class="text-center mb-6">
-            <!-- MUDANÇA VISUAL FINALÍSSIMA: Título e cor alterados -->
-            <h1 class="text-4xl font-bold text-purple-400">EMULADOR PS1 - AGORA VAI!</h1>
+        <!-- MUDANÇA VISUAL: Fundo do cabeçalho alterado para um tom mais claro -->
+        <header class="text-center mb-6 p-4 bg-gray-700 rounded-lg">
+            <!-- MUDANÇA VISUAL: Cor e texto do título alterados -->
+            <h1 class="text-4xl font-bold text-yellow-400">EMULADOR PS1 - FINALMENTE CORRIGIDO</h1>
             <p class="text-gray-400 mt-2">Se vir este texto, a cache foi limpa. Carregue um ficheiro .cue.</p>
         </header>
 
@@ -70,31 +71,28 @@
     </div>
     <div id="toast" class="toast">Mensagem</div>
 
-    <!-- Carregamos o script do emulador primeiro, que cria o objeto wasm_bindgen globalmente -->
-    <script src="./tonic.min.js"></script>
-    <script>
-        // CORREÇÃO FINAL: Usamos um wrapper `DOMContentLoaded` para garantir que o DOM está pronto.
-        // E capturamos o resultado da promessa `wasm_bindgen` para passá-lo explicitamente.
-        document.addEventListener('DOMContentLoaded', (event) => {
-            async function main() {
-                try {
-                    // `wasm_bindgen` é a função global do script tonic.min.js
-                    // Ela carrega o .wasm e retorna um objeto com as exportações do emulador
-                    const Tonic = await wasm_bindgen('./tonic_bg.wasm');
-                    
-                    console.log("Emulador carregado e pronto!");
-                    initializeApp(Tonic);
+    <!-- CORREÇÃO NA ORDEM DE EXECUÇÃO: Adicionamos 'defer' para garantir que os scripts executam na ordem correta -->
+    <script src="./tonic.min.js" defer></script>
+    <script defer>
+        // Esta estrutura garante que este código só é executado depois de 'tonic.min.js' ter sido completamente carregado e executado.
+        
+        async function main() {
+            try {
+                // `wasm_bindgen` é a função global criada pelo script tonic.min.js
+                // Esperamos que ele carregue e compile o ficheiro .wasm associado.
+                await wasm_bindgen('./tonic_bg.wasm');
+                
+                console.log("Emulador carregado e pronto!");
+                initializeApp();
 
-                } catch (error) {
-                    console.error("Erro fatal ao carregar o módulo WebAssembly:", error);
-                    const initialMessage = document.getElementById('initial-message');
-                    initialMessage.innerHTML = `<h2 class="text-xl text-red-400">Erro Fatal!</h2><p class="text-gray-400">Não foi possível carregar o motor do emulador.</p>`;
-                }
+            } catch (error) {
+                console.error("Erro fatal ao carregar o módulo WebAssembly:", error);
+                const initialMessage = document.getElementById('initial-message');
+                initialMessage.innerHTML = `<h2 class="text-xl text-red-400">Erro Fatal!</h2><p class="text-gray-400">Não foi possível carregar o motor do emulador.</p>`;
             }
-            main();
-        });
+        }
 
-        function initializeApp(Tonic) {
+        function initializeApp() {
             const canvas = document.getElementById('game-canvas');
             const initialMessage = document.getElementById('initial-message');
             const romInput = document.getElementById('rom-input');
@@ -133,8 +131,7 @@
                     const romData = new Uint8Array(e.target.result);
                     if (emu) { await emu.exit(); }
                     
-                    // Usamos o objeto Tonic que recebemos após a inicialização do wasm
-                    emu = new Tonic.Emulator(canvas);
+                    emu = new wasm_bindgen.Emulator(canvas);
     
                     try {
                         await emu.load_rom(romData);
@@ -232,6 +229,8 @@
                 request.onerror = (event) => reject(event);
             });
         }
+        
+        main();
     </script>
 </body>
 </html>
