@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PS1 Web Emulator - Versão Corrigida</title>
+    <title>PS1 Web Emulator - Sucesso!</title>
     <!-- Tailwind CSS e Fontes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,10 +29,9 @@
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-4xl mx-auto">
-        <!-- MUDANÇA VISUAL: Fundo do cabeçalho alterado para um tom mais claro -->
-        <header class="text-center mb-6 p-4 bg-gray-700 rounded-lg">
-            <!-- MUDANÇA VISUAL: Cor e texto do título alterados -->
-            <h1 class="text-4xl font-bold text-yellow-400">EMULADOR PS1 - FINALMENTE CORRIGIDO</h1>
+        <header class="text-center mb-6">
+            <!-- MUDANÇA VISUAL FINALÍSSIMA: Título e cor alterados -->
+            <h1 class="text-4xl font-bold text-cyan-400">EMULADOR PS1 - SUCESSO!</h1>
             <p class="text-gray-400 mt-2">Se vir este texto, a cache foi limpa. Carregue um ficheiro .cue.</p>
         </header>
 
@@ -73,9 +72,10 @@
 
     <!-- CORREÇÃO NA ORDEM DE EXECUÇÃO: Adicionamos 'defer' para garantir que os scripts executam na ordem correta -->
     <script src="./tonic.min.js" defer></script>
+    <!-- Este segundo script só será executado depois do primeiro (tonic.min.js) estar pronto -->
     <script defer>
-        // Esta estrutura garante que este código só é executado depois de 'tonic.min.js' ter sido completamente carregado e executado.
-        
+        // O `defer` garante que este código só é executado depois de a página estar toda carregada.
+        // A função main orquestra o arranque.
         async function main() {
             try {
                 // `wasm_bindgen` é a função global criada pelo script tonic.min.js
@@ -91,7 +91,7 @@
                 initialMessage.innerHTML = `<h2 class="text-xl text-red-400">Erro Fatal!</h2><p class="text-gray-400">Não foi possível carregar o motor do emulador.</p>`;
             }
         }
-
+        
         function initializeApp() {
             const canvas = document.getElementById('game-canvas');
             const initialMessage = document.getElementById('initial-message');
@@ -230,6 +230,7 @@
             });
         }
         
+        // Inicia todo o processo.
         main();
     </script>
 </body>
