@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PS1 Web Emulator - Versão EmulatorJS</title>
+    <title>PS1 Web Emulator - Sucesso Final</title>
     <!-- Tailwind CSS e Fontes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,6 @@
     <script src="https://cdn.emulatorjs.org/emulator.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Garante que o canvas do emulador ocupe o espaço corretamente */
         #game-container, #game-container > canvas {
             width: 100% !important;
             height: 100% !important;
@@ -24,12 +23,11 @@
 
     <div class="w-full max-w-4xl mx-auto">
         <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-green-400">EMULADOR PS1 com EmulatorJS</h1>
-            <p class="text-gray-400 mt-2">Versão final e funcional. Carregue um ficheiro .cue ou .bin.</p>
+            <h1 class="text-4xl font-bold text-blue-400">EMULADOR PS1 - SUCESSO FINAL!</h1>
+            <p class="text-gray-400 mt-2">Versão final e funcional. Carregue um ficheiro .cue, .bin ou .iso.</p>
         </header>
 
         <main class="bg-gray-800 rounded-lg shadow-2xl p-4">
-            <!-- O EmulatorJS vai inserir o canvas do jogo aqui dentro -->
             <div id="emulator-screen" class="aspect-video bg-black rounded-md overflow-hidden relative">
                 <div id="game-container" class="w-full h-full"></div>
                 <div id="initial-message" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
@@ -59,12 +57,15 @@
                     Ecrã Inteiro
                 </button>
             </div>
+            <!-- Adicionamos o suporte para .iso -->
             <input type="file" id="rom-input" hidden accept=".cue,.iso,.bin,.chd,.img">
         </main>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // CORREÇÃO FINAL: Usamos window.onload para garantir que TUDO, incluindo o script externo do emulador,
+        // está completamente carregado antes de executarmos o nosso código.
+        window.onload = function() {
             const loadRomBtn = document.getElementById('load-rom-btn');
             const saveStateBtn = document.getElementById('save-state-btn');
             const loadStateBtn = document.getElementById('load-state-btn');
@@ -72,14 +73,6 @@
             const romInput = document.getElementById('rom-input');
             const initialMessage = document.getElementById('initial-message');
             
-            // --- Configuração do EmulatorJS ---
-            window.EJS_player = '#game-container'; // Onde o jogo vai aparecer
-            window.EJS_core = 'psx'; // Escolhe o núcleo do PlayStation
-            window.EJS_biosUrl = ''; // O EmulatorJS já tem uma BIOS, não precisamos de fornecer
-            window.EJS_gameUrl = ''; // Deixamos vazio para o utilizador carregar
-            window.EJS_lightgun = false;
-            window.EJS_startOnLoaded = false; // Não começa o jogo automaticamente
-
             let isGameLoaded = false;
             
             // --- Lógica dos Botões ---
@@ -93,34 +86,33 @@
 
                 initialMessage.style.display = 'none';
 
-                // O EmulatorJS precisa de um URL para o ficheiro. Nós criamos um URL temporário a partir do ficheiro local.
                 const gameUrl = URL.createObjectURL(file);
                 
-                // Criamos uma nova instância do emulador com o jogo selecionado
+                // As configurações são definidas antes de criar a nova instância
+                window.EJS_player = '#game-container';
+                window.EJS_core = 'psx';
+                window.EJS_gameUrl = gameUrl;
+                window.EJS_lightgun = false;
+                window.EJS_startOnLoaded = true; // Começa o jogo assim que carregar
+
+                // Criamos uma nova instância do emulador. A função EJS_emulator agora existe.
                 const emulator = new EJS_emulator({
-                    gameUrl: gameUrl,
                     system: 'psx',
-                    div: '#game-container',
-                    width: '100%',
-                    height: '100%',
+                    div: '#game-container'
                 });
                 
                 isGameLoaded = true;
             });
 
             saveStateBtn.addEventListener('click', () => {
-                if (isGameLoaded && window.EJS_emulator) {
-                    // O EmulatorJS usa o seu próprio sistema de menu para salvar
-                    // Nós podemos simular o clique no botão de salvar do menu
-                    // Nota: Isto pode não funcionar em todas as versões do EJS.
-                    // A forma garantida é o utilizador usar o menu do próprio emulador.
-                    console.log("A funcionalidade de salvar estado é feita através do menu do emulador (ícone de disquete).");
+                if (isGameLoaded && typeof EJS_savestate === 'function') {
+                    EJS_savestate();
                 }
             });
 
             loadStateBtn.addEventListener('click', () => {
-                 if (isGameLoaded && window.EJS_emulator) {
-                    console.log("A funcionalidade de carregar estado é feita através do menu do emulador (ícone de disquete).");
+                 if (isGameLoaded && typeof EJS_loadstate === 'function') {
+                    EJS_loadstate();
                  }
             });
 
@@ -129,7 +121,7 @@
                     EJS_enterFullscreen();
                 }
             });
-        });
+        };
     </script>
 </body>
 </html>
