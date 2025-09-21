@@ -30,8 +30,8 @@
 
     <div class="w-full max-w-4xl mx-auto">
         <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-blue-400">PS1 Web Emulator</h1>
-            <!-- MUDANÇA VISUAL PARA CONFIRMAÇÃO -->
+            <!-- MUDANÇA VISUAL FINAL: Título a verde para confirmação -->
+            <h1 class="text-4xl font-bold text-green-400">PS1 Web Emulator</h1>
             <p class="text-gray-400 mt-2">Versão Final Corrigida - Carregue um ficheiro .cue para jogar.</p>
         </header>
 
@@ -78,11 +78,13 @@
             try {
                 // `wasm_bindgen` é o objeto criado pelo script tonic.min.js
                 // Esperamos que ele carregue o ficheiro .wasm associado
-                const Tonic = await wasm_bindgen('./tonic_bg.wasm');
+                // Esta linha inicializa o módulo e popula o objeto wasm_bindgen com as exportações
+                await wasm_bindgen('./tonic_bg.wasm');
                 
                 // Apenas quando tudo estiver pronto, iniciamos a aplicação
                 console.log("Emulador carregado com sucesso!");
-                initializeApp(Tonic);
+                // Não passamos nada como parâmetro, a função vai usar o objeto global `wasm_bindgen`
+                initializeApp();
 
             } catch (error) {
                 console.error("Erro fatal ao carregar o módulo WebAssembly:", error);
@@ -134,9 +136,8 @@
             });
         }
         
-        // A lógica da aplicação foi movida para esta função.
-        // O parâmetro 'Tonic' agora contém todas as funções do emulador.
-        function initializeApp(Tonic) {
+        // CORREÇÃO: A função não recebe mais parâmetros. Ela usa o `wasm_bindgen` global.
+        function initializeApp() {
             const canvas = document.getElementById('game-canvas');
             const initialMessage = document.getElementById('initial-message');
             const romInput = document.getElementById('rom-input');
@@ -161,8 +162,8 @@
                     const romData = e.target.result;
                     if (emu) { await emu.exit(); }
                     
-                    // Usamos o 'Tonic' que recebemos para criar uma nova instância.
-                    emu = new Tonic.Emulator(canvas);
+                    // CORREÇÃO: Usamos o objeto global `wasm_bindgen` que já foi totalmente inicializado.
+                    emu = new wasm_bindgen.Emulator(canvas);
     
                     try {
                         await emu.load_rom(romData);
